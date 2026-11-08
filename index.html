@@ -69,7 +69,7 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>PRESALE TICKET(Rp 40.000)</h1>
+      <h1>PRESALE TICKET</h1>
       <p>Dies Natalis Teknik Industri</p>
       <div class="quota-badge">
         <i class="fa-solid fa-ticket"></i> Sisa Kuota Presale: <span id="sisaKuota">Memuat...</span>
@@ -79,7 +79,7 @@
     <div class="payment-box">
       <h3><i class="fa-solid fa-wallet"></i> Informasi Rekening Pembayaran</h3>
       <div class="bank-details">
-        <div class="bank-item"><small>SEABank</small><strong>9010-8321-6572</strong><small>a.n. Dwi Lestari</small></div>
+        <div class="bank-item"><small>SeaBank</small><strong>901-083-216-572</strong><small>a.n. Dwi Lestari</small></div>
         <div class="bank-item"><small>E-Wallet (Dana)</small><strong>0856-9496-5938</strong><small>a.n. Dwi Lestari</small></div>
       </div>
     </div>
@@ -111,7 +111,7 @@
         <label><i class="fa-solid fa-pen-to-square"></i> Tuliskan Nama Program Studi</label>
         <input type="text" id="prodiLainnya" class="form-control" placeholder="Masukkan nama program studi Anda">
       </div>
-      
+
       <div class="form-group">
         <label><i class="fa-solid fa-calendar"></i> Angkatan</label>
         <input type="number" id="angkatan" class="form-control" placeholder="Contoh: 2022" required>
@@ -160,6 +160,7 @@
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwgpph9Bsclt3jx4l-Sqo003wE0VBph-w9Hk9PSzoWxAaMWNEVOPcWAvmDU1g0a9VLY4w/exec";
+    
     const form = document.getElementById('registrationForm');
     const submitBtn = document.getElementById('submitBtn');
     const spinner = document.getElementById('spinner');
@@ -167,6 +168,22 @@
     const jenisKartuSelect = document.getElementById('jenisKartu');
     const labelKartu = document.getElementById('labelKartu');
     const sisaKuotaElement = document.getElementById('sisaKuota');
+    
+    const prodiSelect = document.getElementById('prodi');
+    const prodiLainnyaGroup = document.getElementById('prodiLainnyaGroup');
+    const prodiLainnyaInput = document.getElementById('prodiLainnya');
+
+    // Pengaturan muncul/tutup input teks prodi manual
+    prodiSelect.addEventListener('change', (e) => {
+      if (e.target.value === 'Lainnya') {
+        prodiLainnyaGroup.style.display = 'block';
+        prodiLainnyaInput.required = true;
+      } else {
+        prodiLainnyaGroup.style.display = 'none';
+        prodiLainnyaInput.required = false;
+        prodiLainnyaInput.value = '';
+      }
+    });
 
     async function loadKuota() {
       try {
@@ -209,11 +226,15 @@
         const kartuFile = document.getElementById('kartuFile').files[0];
         const buktiFile = document.getElementById('buktiFile').files[0];
 
+        // Ambil nilai prodi (jika Lainnya, ambil teks dari input manual)
+        const selectedProdi = prodiSelect.value;
+        const finalProdi = selectedProdi === 'Lainnya' ? prodiLainnyaInput.value : selectedProdi;
+
         const payload = {
           kategoriTiket: "Presale Ticket",
           nama: document.getElementById('nama').value,
           email: email,
-          prodi: document.getElementById('prodi').value,
+          prodi: finalProdi,
           angkatan: document.getElementById('angkatan').value,
           whatsapp: document.getElementById('whatsapp').value,
           jenisKartu: jenisKartuSelect.value,
@@ -229,6 +250,7 @@
         if (result.result === 'success') {
           successModal.classList.add('active');
           form.reset();
+          prodiLainnyaGroup.style.display = 'none';
           loadKuota();
         } else {
           alert(result.message);
